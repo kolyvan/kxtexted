@@ -1,6 +1,6 @@
 ##KxTextEd
 
-A subclass of UITextView for interactive editing styles of a rich text.
+A subclass of UITextView for interactive editing of a rich text.
 
 ### Features
 
@@ -16,9 +16,11 @@ A subclass of UITextView for interactive editing styles of a rich text.
 - paragraph selection
 - left/right caret navigation
 
+For more info take a look at Demo project. 
+
+### Screenshots
 ![Screenshot](https://raw.github.com/kolyvan/kxtexted/master/docs/texted.png)
 
-For more info take a look at Demo project. 
 
 ### Requirements
 at least iOS 8
