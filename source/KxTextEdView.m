@@ -683,7 +683,7 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     }
 }
 
-#pragma mark - prvavte
+#pragma mark - private
 
 - (UIFont *)styleFont
 {
