@@ -42,5 +42,9 @@
 @property (readwrite, nonatomic, strong) UIColor *foreColor;
 @property (readwrite, nonatomic, strong) UIColor *selectedColor;
 @property (readwrite, nonatomic, strong) UIFont *font;
+@property (readwrite, nonatomic, strong) NSArray *colorPickerPallete;
+@property (readwrite, nonatomic, strong) NSArray *fontNamePickerItems;
+@property (readwrite, nonatomic, strong) NSArray *fontSizePickerItems;
 - (void) needUpdateState;
++ (UIFont *) toolbarFont;
 @end

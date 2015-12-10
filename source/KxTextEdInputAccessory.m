@@ -80,7 +80,10 @@ enum {
 //////////
 
 @implementation KxTextEdInputAccessory {
-    __weak id _pickerView;
+    __weak id   _pickerView;
+    NSArray     *_colorPickerPallete;
+    NSArray     *_fontNamePickerItems;
+    NSArray     *_fontSizePickerItems;
 }
 
 - (instancetype) initWithFrame:(CGRect)frame
@@ -457,6 +460,36 @@ enum {
     return font;
 }
 
+#pragma mark - properties
+
+- (NSArray *) colorPickerPallete
+{
+    if (!_colorPickerPallete) {
+        _colorPickerPallete = [KxTextEdColorPickerView defaultPalette];
+    }
+    return _colorPickerPallete;
+}
+
+- (NSArray *) fontNamePickerItems
+{
+    if (!_fontNamePickerItems) {
+         _fontNamePickerItems = [[UIFont familyNames] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    }
+    return _fontNamePickerItems;
+}
+
+- (NSArray *) fontSizePickerItems
+{
+    if (!_fontSizePickerItems) {
+        NSMutableArray *items = [NSMutableArray array];
+        for (NSUInteger i = 12; i < 31; i += 1) {
+            [items addObject:@((CGFloat)i)];
+        }
+        _fontSizePickerItems = [items copy];
+    }
+    return _fontSizePickerItems;
+}
+
 #pragma mark - UICollectionView
 
 - (NSInteger)numberOfSectionsInCollectionView: (UICollectionView *)collectionView
@@ -517,13 +550,11 @@ enum {
             UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
             KxTextEdView *textView = _textView;
             
-            NSArray *items = [[UIFont familyNames] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-            
             _pickerView = [KxTextEdPickerView presentPickerFromController:nil
                                                                sourceView:cell
                                                                     width:180.
                                                                     title:NSLocalizedString(@"Font", nil)
-                                                                    items:items
+                                                                    items:self.fontNamePickerItems
                                                                  selected:textView.styleFontName
                                                                     block:^(id item)
                            {
@@ -539,16 +570,11 @@ enum {
             UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
             KxTextEdView *textView = _textView;
             
-            NSMutableArray *items = [NSMutableArray array];
-            for (NSUInteger i = 14; i < 28; i += 1) {
-                [items addObject:@((CGFloat)i)];
-            }
-            
             _pickerView = [KxTextEdPickerView presentPickerFromController:nil
                                                                sourceView:cell
                                                                     width:100.
                                                                     title:NSLocalizedString(@"Size", nil)
-                                                                    items:items
+                                                                    items:self.fontSizePickerItems
                                                                  selected:@(textView.styleFontSize)
                                                                     block:^(id item)
                            {
@@ -566,6 +592,7 @@ enum {
             
             _pickerView = [KxTextEdColorPickerView presentPickerFromController:nil
                                                                     sourceView:cell
+                                                                       palette:self.colorPickerPallete
                                                                       selected:_textView.styleTextColor
                                                                          block:^(UIColor *color)
                            {

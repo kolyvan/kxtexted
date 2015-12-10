@@ -44,7 +44,7 @@
 {
     return [self presentPickerFromController:fromVc
                                   sourceView:source
-                                     palette:[self defaultPalette]
+                                     palette:nil
                                     selected:selected
                                        block:block];
 }
@@ -55,6 +55,10 @@
                                     selected:(UIColor *)selected
                                        block:(void(^)(UIColor *))block
 {
+    if (!palette) {
+        palette = [self defaultPalette];
+    }
+    
     if (!fromVc) {
         fromVc = [UIApplication sharedApplication].keyWindow.rootViewController;
     }

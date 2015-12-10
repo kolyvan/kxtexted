@@ -56,4 +56,6 @@
 
 - (void) dismissPicker;
 
++ (NSArray *) defaultPalette;
+
 @end
