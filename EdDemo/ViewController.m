@@ -45,8 +45,8 @@
     [self.view addSubview:_textView];
     
     
-#if 0
-    
+#if 1
+        
     _textView.text = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\nExcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 #else
     
@@ -55,7 +55,12 @@
     
     [self prepareInputAccessory];
     
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(actionSearch:)];
+    self.navigationItem.leftBarButtonItems =
+    @[
+      [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(actionSearch:)],
+      
+      [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionMore:)],
+      ];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShowNotification:)
@@ -67,7 +72,7 @@
                                                  name:UIKeyboardWillHideNotification
                                                object:nil];
     
-    self.editing = YES;    
+    self.editing = YES;
 }
 
 - (void) viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
@@ -79,7 +84,6 @@
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {        
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         
-        NSLog(@"DID ROTATE");
         [self prepareInputAccessory];
     }];
 }
@@ -162,6 +166,91 @@
         
         [_searchBar becomeFirstResponder];
     }
+}
+
+- (void) actionMore:(id)sender
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Actions"
+                                                                   message:nil
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+ 
+    __weak __typeof(self) weakSelf = self;
+    [alert addAction:[UIAlertAction actionWithTitle:@"Save"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction *action)
+                      {
+                          [weakSelf actionSave:nil];
+                      }]];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Load"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction *action)
+                      {
+                          [weakSelf actionLoad:nil];
+                      }]];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                              style:UIAlertActionStyleCancel
+                                            handler:nil]];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (void) actionLoad:(id)sender
+{
+    NSString *contentPath = self.class.contentPath;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:contentPath]) {
+        return;
+    }
+    
+    NSTextStorage *textStorage = _textView.textStorage;
+    
+    [textStorage beginEditing];
+    
+    [textStorage replaceCharactersInRange:NSMakeRange(0, textStorage.length) withString:@""];
+
+    [textStorage readFromURL:[NSURL fileURLWithPath:contentPath]
+                     options:@{ NSDocumentTypeDocumentAttribute : NSRTFDTextDocumentType, }
+          documentAttributes:nil
+                       error:nil];
+    
+    [textStorage endEditing];
+}
+
+- (void) actionSave:(id)sender
+{
+    NSTextStorage *textStorage = _textView.textStorage;
+    NSMutableAttributedString *mas = [textStorage mutableCopy];
+    
+    NSRange range = {0, mas.length};
+    [mas fixAttributesInRange:range];
+    
+    NSString *contentPath = self.class.contentPath;
+    [[NSFileManager defaultManager] removeItemAtPath:contentPath error:nil];
+    
+    NSFileWrapper *fw = [mas fileWrapperFromRange:range
+                               documentAttributes:@{ NSDocumentTypeDocumentAttribute : NSRTFDTextDocumentType, }
+                                            error:nil];
+    
+    if (fw) {
+        
+        if ([fw writeToURL:[NSURL fileURLWithPath:contentPath]
+                   options:NSFileWrapperWritingWithNameUpdating
+       originalContentsURL:nil
+                     error:nil]) {
+            
+            NSLog(@"save at %@", contentPath);
+        }
+    }
+}
+
++ (NSString *) contentPath
+{
+    NSString *docsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+                                                              NSUserDomainMask,
+                                                              YES) lastObject];
+    
+    return [docsPath stringByAppendingPathComponent:@"content"];
 }
 
 #pragma mark - UITextViewDelegate

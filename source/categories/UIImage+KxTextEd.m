@@ -78,4 +78,58 @@
     return sType ? (__bridge NSString *)sType : nil;
 }
 
+- (UIImage *) texted_resizeImageWithRatio:(CGFloat)ratio
+{
+    if (ratio <= 0. || ratio == 1.) {
+        return self;
+    }
+    
+    CGImageRef cgImage = self.CGImage;
+    const CGFloat W = roundf(CGImageGetWidth(cgImage) * ratio);
+    const CGFloat H = roundf(CGImageGetHeight(cgImage) * ratio);
+    const size_t bitsPerComponent = CGImageGetBitsPerComponent(cgImage);
+    const size_t bytesPerRow = CGImageGetBytesPerRow(cgImage);
+    CGColorSpaceRef colorSpace = CGImageGetColorSpace(cgImage);
+    CGBitmapInfo bitmapInfo = CGImageGetBitmapInfo(cgImage);
+    
+    if (CGColorSpaceGetNumberOfComponents(colorSpace) == 3) {
+        const uint32_t alpha = (bitmapInfo & kCGBitmapAlphaInfoMask);
+        if (alpha == kCGImageAlphaNone) {
+            
+            bitmapInfo &= ~kCGBitmapAlphaInfoMask;
+            bitmapInfo |= kCGImageAlphaNoneSkipFirst;
+            
+        } else if (!(alpha == kCGImageAlphaNoneSkipFirst ||
+                     alpha == kCGImageAlphaNoneSkipLast)) {
+            
+            bitmapInfo &= ~kCGBitmapAlphaInfoMask;
+            bitmapInfo |= kCGImageAlphaPremultipliedFirst;
+        }
+    }
+    
+    CGContextRef context = CGBitmapContextCreate(NULL,
+                                                 W,
+                                                 H,
+                                                 bitsPerComponent,
+                                                 bytesPerRow,
+                                                 colorSpace,
+                                                 bitmapInfo);    
+    if (context) {
+        
+        CGContextSetInterpolationQuality(context, kCGInterpolationHigh);
+        CGContextDrawImage(context, (CGRect){0., 0., W, H}, cgImage);
+        CGImageRef result = CGBitmapContextCreateImage(context);
+        CGContextRelease(context);
+        if (result) {
+            UIImage *image = [UIImage imageWithCGImage:result
+                                                 scale:self.scale
+                                           orientation:self.imageOrientation];
+            CGImageRelease(result);
+            return image;
+        }
+    }
+    
+    return nil;
+}
+
 @end

@@ -19,6 +19,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
+    NSLog(@"%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+                                                      NSUserDomainMask,
+                                                      YES) lastObject]);
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     ViewController *vc = [ViewController new];
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];

@@ -548,6 +548,19 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
             imgSize.width *= (maxSize.height / imgSize.height);
             imgSize.height = maxSize.height;
         }
+        
+        if (image &&
+            (image.size.width > imgSize.width ||
+             image.size.height > imgSize.height))
+        {
+            const CGFloat R = MIN(imgSize.width / image.size.width,
+                                  imgSize.height / image.size.height);
+            UIImage *resized = [image texted_resizeImageWithRatio:R];
+            if (resized) {
+                image = resized;
+                imgSize = resized.size;
+            }
+        }
     }
     
     NSTextAttachment *textAttach = [[NSTextAttachment alloc] initWithData:nil ofType:UTI];

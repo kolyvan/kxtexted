@@ -36,5 +36,6 @@
 @interface UIImage(KxTextEd)
 
 + (NSString *) texted_sourceTypeWithPath:(NSString *)path size:(CGSize *)outSize;
+- (UIImage *) texted_resizeImageWithRatio:(CGFloat)ratio;
 
 @end
