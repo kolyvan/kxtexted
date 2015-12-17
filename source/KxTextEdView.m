@@ -1056,14 +1056,17 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         [self.textStorage insertAttributedString:astring atIndex:range.location];
     }
     
-    if (self.selectedRange.location == self.textStorage.length) {
+    NSUInteger location = range.location + astring.length;
+    
+    if (location == self.textStorage.length) {
         
         // fix losting of the default style at end of document
-        NSAttributedString *as = [[NSAttributedString alloc] initWithString:@"" attributes:self.defaultStyle];
-        [self.textStorage insertAttributedString:as atIndex:self.selectedRange.location];
+        NSAttributedString *as = [[NSAttributedString alloc] initWithString:@" " attributes:self.defaultStyle];
+        [self.textStorage insertAttributedString:as atIndex:location];
+        location += 1;
     }
     
-    return NSMakeRange(range.location + astring.length, 0);
+    return NSMakeRange(location, 0);
 }
 
 #pragma mark - override
