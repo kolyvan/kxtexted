@@ -323,6 +323,10 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         [self.textStorage addAttribute:NSForegroundColorAttributeName
                                  value:_defaultTextColor
                                  range:selRange];
+        
+        [self.textStorage addAttribute:NSParagraphStyleAttributeName
+                                 value:[NSParagraphStyle new]
+                                 range:selRange];
 
         [self.textStorage endEditing];
         
@@ -413,13 +417,6 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     
     NSAttributedString *as = [[NSAttributedString alloc] initWithString:title attributes:atts];
     [self insertAttributedStringAtCaret:as];
-    
-    if (self.selectedRange.location == self.textStorage.length) {
-        
-        // fix losting of the default style at end of document
-        NSAttributedString *as = [[NSAttributedString alloc] initWithString:@" " attributes:self.defaultStyle];
-        [self.textStorage insertAttributedString:as atIndex:self.selectedRange.location];
-    }
 }
 
 - (void) askUserInsertURL
@@ -906,7 +903,8 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
 - (NSDictionary *) defaultStyle
 {
     return @{ NSFontAttributeName : self.styleFont,
-              NSForegroundColorAttributeName  : self.styleTextColor };
+              NSForegroundColorAttributeName  : self.styleTextColor,
+              NSParagraphStyleAttributeName : [NSParagraphStyle new], };
 }
 
 - (NSDictionary *) styleListItem
@@ -1025,6 +1023,13 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     
     if (astring) {
         [self.textStorage insertAttributedString:astring atIndex:range.location];
+    }
+    
+    if (self.selectedRange.location == self.textStorage.length) {
+        
+        // fix losting of the default style at end of document
+        NSAttributedString *as = [[NSAttributedString alloc] initWithString:@"" attributes:self.defaultStyle];
+        [self.textStorage insertAttributedString:as atIndex:self.selectedRange.location];
     }
     
     return NSMakeRange(range.location + astring.length, 0);

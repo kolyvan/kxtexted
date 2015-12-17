@@ -78,4 +78,6 @@
 - (void) actionEditLink:(id)sender;
 - (void) actionOpenLink:(id)sender;
 
+- (NSDictionary *) defaultStyle;
+
 @end
