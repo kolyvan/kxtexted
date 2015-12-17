@@ -73,4 +73,9 @@
 
 - (UIFont *)styleFont;
 
+- (NSArray *) customMenuItems;
+- (void) addCustomMenuItems;
+- (void) actionEditLink:(id)sender;
+- (void) actionOpenLink:(id)sender;
+
 @end

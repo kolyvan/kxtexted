@@ -427,7 +427,15 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     NSString *linkTitle, *urlString;
     BOOL editLink = NO;
     
-    if (self.selectedRange.length) {
+    NSRange linkRange = {0};
+    const NSRange paraRange = [self.textStorage.string paragraphRangeForRange:self.selectedRange];
+    if ([self.textStorage attribute:NSLinkAttributeName
+                            atIndex:self.selectedRange.location
+              longestEffectiveRange:&linkRange
+                            inRange:paraRange] &&
+        linkRange.length)
+    {
+        self.selectedRange = linkRange;
         
         UITextRange *selectionRange = [self selectedTextRange];
         NSString *text = [self textInRange:selectionRange];
@@ -693,6 +701,60 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         [UIView performWithoutAnimation:^{
             [self scrollRangeToVisible:self.selectedRange];
         }];
+    }
+}
+
+- (NSArray *) customMenuItems
+{
+    UIMenuItem *editItem = [[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit URL", nil)
+                                                      action:@selector(actionEditLink:)];
+    
+    UIMenuItem *openItem = [[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Open URL", nil)
+                                                      action:@selector(actionOpenLink:)];
+    
+    return @[editItem, openItem];
+}
+
+- (void) addCustomMenuItems
+{
+    NSArray *menuItems = self.customMenuItems;
+    if (menuItems.count) {
+        [UIMenuController sharedMenuController].menuItems = menuItems;
+    }
+}
+
+#pragma mark - actions
+
+- (void) actionEditLink:(id)sender
+{
+    [self askUserInsertURL];
+}
+
+- (void) actionOpenLink:(id)sender
+{
+    NSRange linkRange = {0};
+    const NSRange paraRange = [self.textStorage.string paragraphRangeForRange:self.selectedRange];
+    id val = [self.textStorage attribute:NSLinkAttributeName
+                                 atIndex:self.selectedRange.location
+                   longestEffectiveRange:&linkRange
+                                 inRange:paraRange];
+    
+    if (val && linkRange.length) {
+        
+        NSURL *URL;
+        
+        if ([val isKindOfClass:[NSURL class]]) {
+            URL = val;
+        } else if ([val isKindOfClass:[NSString class]]) {
+            URL = [NSURL URLWithString:val];
+        }
+        
+        if (URL &&
+            (![self.delegate respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)] ||
+             [self.delegate textView:self shouldInteractWithURL:val inRange:linkRange]))
+        {
+            [[UIApplication sharedApplication] openURL:URL];
+        }
     }
 }
 
@@ -1033,7 +1095,20 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         }
     }
     
+    if (action == @selector(actionEditLink:) ||
+        action == @selector(actionOpenLink:))
+    {
+        id val = [self attribute:NSLinkAttributeName atRange:self.selectedRange];
+        return val != nil;
+    }
+    
     return [super canPerformAction:action withSender:sender];
+}
+
+- (BOOL)canBecomeFirstResponder
+{
+    [self addCustomMenuItems];
+    return [super canBecomeFirstResponder];
 }
 
 #if 0
