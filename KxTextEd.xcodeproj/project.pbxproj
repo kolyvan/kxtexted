@@ -13,8 +13,8 @@
 		F9ADA5A81C182528009BD9AC /* KxTextEd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9FD6D4E1C11694700631510 /* KxTextEd.framework */; };
 		F9ADA5BF1C183C82009BD9AC /* UIFont+KxTextEd.m in Sources */ = {isa = PBXBuildFile; fileRef = F9ADA5B91C183C82009BD9AC /* UIFont+KxTextEd.m */; };
 		F9ADA5C01C183C82009BD9AC /* UIImage+KxTextEd.m in Sources */ = {isa = PBXBuildFile; fileRef = F9ADA5BA1C183C82009BD9AC /* UIImage+KxTextEd.m */; };
-		F9ADA5C21C183C82009BD9AC /* UIFont+KxTextEd.h in Headers */ = {isa = PBXBuildFile; fileRef = F9ADA5BC1C183C82009BD9AC /* UIFont+KxTextEd.h */; };
-		F9ADA5C31C183C82009BD9AC /* UIImage+KxTextEd.h in Headers */ = {isa = PBXBuildFile; fileRef = F9ADA5BD1C183C82009BD9AC /* UIImage+KxTextEd.h */; };
+		F9ADA5C21C183C82009BD9AC /* UIFont+KxTextEd.h in Headers */ = {isa = PBXBuildFile; fileRef = F9ADA5BC1C183C82009BD9AC /* UIFont+KxTextEd.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F9ADA5C31C183C82009BD9AC /* UIImage+KxTextEd.h in Headers */ = {isa = PBXBuildFile; fileRef = F9ADA5BD1C183C82009BD9AC /* UIImage+KxTextEd.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F9F919111C156C8200AD0141 /* KxTextEdPickerView.h in Headers */ = {isa = PBXBuildFile; fileRef = F9F9190F1C156C8200AD0141 /* KxTextEdPickerView.h */; };
 		F9F919121C156C8200AD0141 /* KxTextEdPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = F9F919101C156C8200AD0141 /* KxTextEdPickerView.m */; };
 		F9F919151C15748500AD0141 /* KxTextEdColorPickerView.h in Headers */ = {isa = PBXBuildFile; fileRef = F9F919131C15748500AD0141 /* KxTextEdColorPickerView.h */; };
@@ -608,6 +608,7 @@
 				F9ADA5AC1C182528009BD9AC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F9FD6D481C11694700631510 /* Build configuration list for PBXProject "KxTextEd" */ = {
 			isa = XCConfigurationList;

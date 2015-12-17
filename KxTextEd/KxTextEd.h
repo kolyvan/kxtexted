@@ -18,4 +18,6 @@ FOUNDATION_EXPORT const unsigned char KxTextEdVersionString[];
 
 #import <KxTextEd/KxTextEdView.h>
 #import <KxTextEd/KxTextEdInputAccessory.h>
+#import <KxTextEd/UIFont+KxTextEd.h>
+#import <KxTextEd/UIImage+KxTextEd.h>
 
