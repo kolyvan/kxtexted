@@ -761,8 +761,8 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         }
         
         if (URL &&
-            (![self.delegate respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)] ||
-             [self.delegate textView:self shouldInteractWithURL:val inRange:linkRange]))
+            (![self.realDelegate respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)] ||
+             [self.realDelegate textView:self shouldInteractWithURL:val inRange:linkRange]))
         {
             [[UIApplication sharedApplication] openURL:URL];
         }

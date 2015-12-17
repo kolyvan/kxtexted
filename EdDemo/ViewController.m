@@ -261,6 +261,11 @@
     return YES;
 }
 
+- (void) textViewDidChange:(UITextView *)textView
+{
+    NSLog(@"textViewDidChange: %@", NSStringFromRange(textView.selectedRange));
+}
+
 #pragma mark - UISearchBarDelegate
 
 - (void)searchBar:(UISearchBar *)searchBar
