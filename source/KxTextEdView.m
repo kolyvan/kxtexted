@@ -424,35 +424,50 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     NSString *linkTitle, *urlString;
     BOOL editLink = NO;
     
-    NSRange linkRange = {0};
-    const NSRange paraRange = [self.textStorage.string paragraphRangeForRange:self.selectedRange];
-    if ([self.textStorage attribute:NSLinkAttributeName
-                            atIndex:self.selectedRange.location
-              longestEffectiveRange:&linkRange
-                            inRange:paraRange] &&
-        linkRange.length)
-    {
-        self.selectedRange = linkRange;
+    const NSUInteger textLen = self.textStorage.length;
+    if (textLen) {
         
-        UITextRange *selectionRange = [self selectedTextRange];
-        NSString *text = [self textInRange:selectionRange];
-        if (text.length) {
+        const NSRange selRange = self.selectedRange;
+        
+        NSRange linkRange = {0};
+        NSRange paraRange = [self.textStorage.string paragraphRangeForRange:selRange];
+        if (paraRange.location == NSNotFound) {
+            paraRange = (NSRange){0, textLen};
+        }
+        
+        NSUInteger caretIndex = selRange.location;
+        if (caretIndex >= textLen) {
+            caretIndex = textLen - 1;
+        }
+        
+        if ([self.textStorage attribute:NSLinkAttributeName
+                                atIndex:caretIndex
+                  longestEffectiveRange:&linkRange
+                                inRange:paraRange] &&
+            linkRange.length)
+        {
+            self.selectedRange = linkRange;
             
-            NSURL *URL = [self attribute:NSLinkAttributeName atRange:self.selectedRange];
-            if (URL) {
+            UITextRange *selectionRange = [self selectedTextRange];
+            NSString *text = [self textInRange:selectionRange];
+            if (text.length) {
                 
-                editLink = YES;
-                linkTitle = text;
-                urlString = URL.absoluteString;
-                
-            } else {
-                
-                URL = [NSURL URLWithString:text];
+                NSURL *URL = [self attribute:NSLinkAttributeName atRange:self.selectedRange];
                 if (URL) {
-                    linkTitle = URL.host;
-                    urlString = URL.absoluteString;
-                } else {
+                    
+                    editLink = YES;
                     linkTitle = text;
+                    urlString = URL.absoluteString;
+                    
+                } else {
+                    
+                    URL = [NSURL URLWithString:text];
+                    if (URL) {
+                        linkTitle = URL.host;
+                        urlString = URL.absoluteString;
+                    } else {
+                        linkTitle = text;
+                    }
                 }
             }
         }
@@ -729,10 +744,26 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
 
 - (void) actionOpenLink:(id)sender
 {
+    const NSUInteger textLen = self.textStorage.length;
+    if (!textLen) {
+        return;
+    }
+
+    const NSRange selRange = self.selectedRange;
+    
+    const NSUInteger caretIndex = selRange.location;
+    if (caretIndex >= textLen) {
+        return;
+    }
+    
     NSRange linkRange = {0};
-    const NSRange paraRange = [self.textStorage.string paragraphRangeForRange:self.selectedRange];
+    NSRange paraRange = [self.textStorage.string paragraphRangeForRange:selRange];
+    if (paraRange.location == NSNotFound) {
+        paraRange = (NSRange){0, textLen};
+    }
+    
     id val = [self.textStorage attribute:NSLinkAttributeName
-                                 atIndex:self.selectedRange.location
+                                 atIndex:caretIndex
                    longestEffectiveRange:&linkRange
                                  inRange:paraRange];
     
@@ -1103,6 +1134,10 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     if (action == @selector(actionEditLink:) ||
         action == @selector(actionOpenLink:))
     {
+        if (!self.hasText) {
+            return NO;
+        }
+        
         id val = [self attribute:NSLinkAttributeName atRange:self.selectedRange];
         return val != nil;
     }
