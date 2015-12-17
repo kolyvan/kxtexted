@@ -310,24 +310,7 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     if (selRange.length) {
 
         [self.textStorage beginEditing];
-        
-        [self.textStorage removeAttribute:NSBackgroundColorAttributeName range:selRange];
-        [self.textStorage removeAttribute:NSUnderlineStyleAttributeName range:selRange];
-        [self.textStorage removeAttribute:NSStrikethroughStyleAttributeName range:selRange];
-        [self.textStorage removeAttribute:NSBaselineOffsetAttributeName range:selRange];
-        
-        [self.textStorage addAttribute:NSFontAttributeName
-                                 value:_defaultFont
-                                 range:selRange];
-
-        [self.textStorage addAttribute:NSForegroundColorAttributeName
-                                 value:_defaultTextColor
-                                 range:selRange];
-        
-        [self.textStorage addAttribute:NSParagraphStyleAttributeName
-                                 value:[NSParagraphStyle new]
-                                 range:selRange];
-
+        [self.textStorage setAttributes:self.defaultStyle range:selRange];
         [self.textStorage endEditing];
         
         if (_allowExtUndo) {
@@ -336,7 +319,7 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         
     } else {
         
-        self.typingAttributes = @{};
+        self.typingAttributes = self.defaultStyle;
     }
 }
 
@@ -933,8 +916,8 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
 
 - (NSDictionary *) defaultStyle
 {
-    return @{ NSFontAttributeName : self.styleFont,
-              NSForegroundColorAttributeName  : self.styleTextColor,
+    return @{ NSFontAttributeName : _defaultFont,
+              NSForegroundColorAttributeName  : _defaultTextColor,
               NSParagraphStyleAttributeName : [NSParagraphStyle new], };
 }
 
