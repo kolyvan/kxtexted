@@ -753,18 +753,20 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     if (val && linkRange.length) {
         
         NSURL *URL;
-        
         if ([val isKindOfClass:[NSURL class]]) {
             URL = val;
         } else if ([val isKindOfClass:[NSString class]]) {
             URL = [NSURL URLWithString:val];
         }
         
-        if (URL &&
-            (![self.realDelegate respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)] ||
-             [self.realDelegate textView:self shouldInteractWithURL:val inRange:linkRange]))
-        {
-            [[UIApplication sharedApplication] openURL:URL];
+        if (URL) {
+            
+            id<UITextViewDelegate> delegate = self.realDelegate;
+            if ((![delegate respondsToSelector:@selector(textView:shouldInteractWithURL:inRange:)] ||
+                 [delegate textView:self shouldInteractWithURL:val inRange:linkRange]))
+            {
+                [[UIApplication sharedApplication] openURL:URL];
+            }
         }
     }
 }
@@ -836,6 +838,11 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         [self.textStorage addAttribute:name value:value range:range];
     } else {
         [self.textStorage removeAttribute:name range:range];
+    }
+    
+    id<UITextViewDelegate> delegate = self.realDelegate;
+    if ([delegate respondsToSelector:@selector(textViewDidChange:)]) {
+        [delegate textViewDidChange:self];
     }
 }
 
@@ -912,6 +919,11 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     }
     
     [self.textStorage endEditing];
+    
+    id<UITextViewDelegate> delegate = self.realDelegate;
+    if ([delegate respondsToSelector:@selector(textViewDidChange:)]) {
+        [delegate textViewDidChange:self];
+    }
 }
 
 - (NSDictionary *) defaultStyle
@@ -1049,6 +1061,11 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         location += 1;
     }
     
+    id<UITextViewDelegate> delegate = self.realDelegate;
+    if ([delegate respondsToSelector:@selector(textViewDidChange:)]) {
+        [delegate textViewDidChange:self];
+    }
+    
     return NSMakeRange(location, 0);
 }
 
@@ -1070,7 +1087,6 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
 {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    // NSLog(@"paste: %@", [pasteboard pasteboardTypes]);
     // TODO: public.rtf, Apple Web Archive pasteboard type, iOS rich content paste pasteboard type
     
     if ([pasteboard containsPasteboardTypes:@[@"public.url", @"public.image"]]) {
