@@ -701,10 +701,10 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
 
 - (NSArray *) customMenuItems
 {
-    UIMenuItem *editItem = [[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit URL", nil)
+    UIMenuItem *editItem = [[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Edit Link", nil)
                                                       action:@selector(actionEditLink:)];
     
-    UIMenuItem *openItem = [[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Open URL", nil)
+    UIMenuItem *openItem = [[UIMenuItem alloc] initWithTitle:NSLocalizedString(@"Open Link", nil)
                                                       action:@selector(actionOpenLink:)];
     
     return @[editItem, openItem];
