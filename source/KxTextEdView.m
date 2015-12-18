@@ -886,7 +886,7 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
 {
     NSMutableDictionary *md = self.typingAttributes ? [self.typingAttributes mutableCopy] : [NSMutableDictionary dictionary];
     block(md);
-    self.typingAttributes = md.count ? md : nil;
+    self.typingAttributes = md.count ? md : @{};
 }
 
 - (BOOL) enumerateParaInRange:(NSRange )range
