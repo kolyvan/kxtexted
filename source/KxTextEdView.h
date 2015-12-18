@@ -80,4 +80,8 @@
 
 - (NSDictionary *) defaultStyle;
 
+- (NSString *) texted_textInRange:(NSRange)range;
+- (BOOL) texted_textHasPrefix:(NSString *)prefix;
+- (BOOL) texted_textHasSuffix:(NSString *)suffix;
+
 @end

@@ -718,6 +718,42 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     }
 }
 
+- (NSString *) texted_textInRange:(NSRange)range
+{
+    if (!self.hasText) {
+        return nil;
+    }
+    
+    UITextPosition *pos1 = [self positionFromPosition:self.beginningOfDocument offset:range.location];
+    UITextPosition *pos2 = [self positionFromPosition:pos1 offset:range.length];
+    UITextRange *textRange = [self textRangeFromPosition:pos1 toPosition:pos2];
+    return [self textInRange:textRange];
+}
+
+- (BOOL) texted_textHasPrefix:(NSString *)prefix
+{
+    if (!self.hasText) {
+        return NO;
+    }
+    
+    UITextPosition *pos = [self positionFromPosition:self.beginningOfDocument offset:1];
+    UITextRange *textRange = [self textRangeFromPosition:self.beginningOfDocument toPosition:pos];
+    NSString *first = [self textInRange:textRange];
+    return [prefix isEqualToString:first];
+}
+
+- (BOOL) texted_textHasSuffix:(NSString *)suffix
+{
+    if (!self.hasText) {
+        return NO;
+    }
+    
+    UITextPosition *pos = [self positionFromPosition:self.endOfDocument offset:-1];
+    UITextRange *textRange = [self textRangeFromPosition:pos toPosition:self.endOfDocument];
+    NSString *last = [self textInRange:textRange];
+    return [suffix isEqualToString:last];
+}
+
 #pragma mark - actions
 
 - (void) actionEditLink:(id)sender
@@ -1056,9 +1092,13 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     if (location == self.textStorage.length) {
         
         // fix losting of the default style at end of document
-        NSAttributedString *as = [[NSAttributedString alloc] initWithString:@" " attributes:self.defaultStyle];
-        [self.textStorage insertAttributedString:as atIndex:location];
-        location += 1;
+        if ([self texted_textHasSuffix:@"\n"]) {
+            [self.textStorage addAttributes:self.defaultStyle range:NSMakeRange(location-1, 1)];
+        } else {
+            NSAttributedString *as = [[NSAttributedString alloc] initWithString:@" " attributes:self.defaultStyle];
+            [self.textStorage insertAttributedString:as atIndex:location];
+            location += 1;
+        }
     }
     
     id<UITextViewDelegate> delegate = self.realDelegate;
