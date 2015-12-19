@@ -1069,14 +1069,17 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         //KxTextEdView *invTarget = [self.undoManager prepareWithInvocationTarget:self];
         //[invTarget insertAttributedString:as range:NSMakeRange(range.location, astring.length)];
         
-        const NSRange undoRange = NSMakeRange(range.location, astring.length);
-        [self.undoManager registerUndoWithTarget:self handler:^(id target) {
-            KxTextEdView *p = target;
-            const NSRange r = [p insertAttributedString:as range:undoRange];
-            self.selectedRange = NSMakeRange(r.location, 0);
-        }];
-        
-        [self.undoManager setActionName:@"Insert"];
+        if ([self.undoManager respondsToSelector:@selector(registerUndoWithTarget:handler:)]) {
+            
+            const NSRange undoRange = NSMakeRange(range.location, astring.length);
+            [self.undoManager registerUndoWithTarget:self handler:^(id target) {
+                KxTextEdView *p = target;
+                const NSRange r = [p insertAttributedString:as range:undoRange];
+                self.selectedRange = NSMakeRange(r.location, 0);
+            }];
+            
+            [self.undoManager setActionName:@"Insert"];
+        }
     }
     
     if (range.length) {
