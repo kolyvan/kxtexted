@@ -616,7 +616,10 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     NSRange paraRange = [self.textStorage.string paragraphRangeForRange:self.selectedRange];
     if (paraRange.length) {
         if (paraRange.length > 1) {
-            paraRange.length -= 1; // skip term \n
+            NSString *last = [self texted_textInRange:NSMakeRange(NSMaxRange(paraRange) - 1, 1)];
+            if ([last isEqualToString:@"\n"]) {
+                paraRange.length -= 1; // skip term \n
+            }
         }
         self.selectedRange = paraRange;
     }
