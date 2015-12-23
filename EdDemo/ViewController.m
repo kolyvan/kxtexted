@@ -104,6 +104,10 @@
             v.textView = _textView;
             v;
         });
+        
+        UITextInputAssistantItem* item = [_textView inputAssistantItem];
+        item.leadingBarButtonGroups = @[];
+        item.trailingBarButtonGroups = @[];
     }
 }
 

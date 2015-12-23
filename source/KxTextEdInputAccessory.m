@@ -40,6 +40,9 @@
 @import CoreText;
 
 enum {
+    KxTextEdButtonUndo,
+    KxTextEdButtonRedo,
+    KxTextEdButtonPaste,
     KxTextEdButtonClear,
     KxTextEdButtonSelectPara,
     KxTextEdButtonSep1,
@@ -65,10 +68,6 @@ enum {
     KxTextEdButtonAddLink,
     KxTextEdButtonAddImage,
     KxTextEdButtonSep3,
-    KxTextEdButtonUndo,
-    KxTextEdButtonRedo,
-    KxTextEdButtonPaste,
-    KxTextEdButtonSep4,
     KxTextEdButtonArrowLeft,
     KxTextEdButtonArrowRight,
     KxTextEdButtonArrowTab,
@@ -366,7 +365,7 @@ enum {
             break;
         }
          
-        case KxTextEdButtonSep1: case KxTextEdButtonSep2: case KxTextEdButtonSep3: case KxTextEdButtonSep4:
+        case KxTextEdButtonSep1: case KxTextEdButtonSep2: case KxTextEdButtonSep3:
             cell.label.attributedText = nil;
             break;
             
@@ -735,14 +734,13 @@ enum {
     
     CGFloat W;
     if (indexPath.row == KxTextEdButtonFontName) {
-        W = 100.;
+        W = self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassRegular ? 120. : 100.;
     } else if (indexPath.row == KxTextEdButtonSep1 ||
                indexPath.row == KxTextEdButtonSep2 ||
-               indexPath.row == KxTextEdButtonSep3 ||
-               indexPath.row == KxTextEdButtonSep4) {
+               indexPath.row == KxTextEdButtonSep3) {
         W = 10.;
     } else {
-        W = 40.;
+        W = self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassRegular ? 44. : 40.;
     };
     return (CGSize){W, H};
 }
