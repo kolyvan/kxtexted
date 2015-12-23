@@ -40,7 +40,9 @@
 @import CoreText;
 
 enum {
-
+    KxTextEdButtonClear,
+    KxTextEdButtonSelectPara,
+    KxTextEdButtonSep1,
     KxTextEdButtonBold,
     KxTextEdButtonItalic,
     KxTextEdButtonUnderline,
@@ -57,16 +59,16 @@ enum {
     KxTextEdButtonParaIndentDec,
     KxTextEdButtonSuperscript,
     KxTextEdButtonSubscript,
-    KxTextEdButtonClear,
-    KxTextEdButtonSep1,
+    KxTextEdButtonSep2,
     KxTextEdButtonListBullets,
     KxTextEdButtonListNumbers,
     KxTextEdButtonAddLink,
     KxTextEdButtonAddImage,
-    KxTextEdButtonSelectPara,
-    KxTextEdButtonSep2,
+    KxTextEdButtonSep3,
     KxTextEdButtonUndo,
     KxTextEdButtonRedo,
+    KxTextEdButtonPaste,
+    KxTextEdButtonSep4,
     KxTextEdButtonArrowLeft,
     KxTextEdButtonArrowRight,
     KxTextEdButtonArrowTab,
@@ -364,7 +366,7 @@ enum {
             break;
         }
          
-        case KxTextEdButtonSep1: case KxTextEdButtonSep2:
+        case KxTextEdButtonSep1: case KxTextEdButtonSep2: case KxTextEdButtonSep3: case KxTextEdButtonSep4:
             cell.label.attributedText = nil;
             break;
             
@@ -383,6 +385,15 @@ enum {
             NSDictionary *atts = @{ NSFontAttributeName : [self.class toolbarFont],
                                     NSForegroundColorAttributeName : color};
             cell.label.attributedText = [[NSAttributedString alloc] initWithString:@"\ue814" attributes:atts];
+            break;
+        }
+            
+        case KxTextEdButtonPaste: {
+            
+            UIColor *color = [_textView canPerformAction:@selector(paste:) withSender:nil] ? _foreColor : [UIColor grayColor];
+            NSDictionary *atts = @{ NSFontAttributeName : [self.class toolbarFont],
+                                    NSForegroundColorAttributeName : color};
+            cell.label.attributedText = [[NSAttributedString alloc] initWithString:@"\ue818" attributes:atts];
             break;
         }
             
@@ -693,6 +704,11 @@ enum {
             [collectionView reloadSections:[NSIndexSet indexSetWithIndex:0]];
             break;
             
+        case KxTextEdButtonPaste:
+            [_textView paste:nil];
+            [collectionView reloadSections:[NSIndexSet indexSetWithIndex:0]];
+            break;
+            
         case KxTextEdButtonArrowLeft:
             [_textView caretGoLeft];
             break;
@@ -721,7 +737,9 @@ enum {
     if (indexPath.row == KxTextEdButtonFontName) {
         W = 100.;
     } else if (indexPath.row == KxTextEdButtonSep1 ||
-               indexPath.row == KxTextEdButtonSep2) {
+               indexPath.row == KxTextEdButtonSep2 ||
+               indexPath.row == KxTextEdButtonSep3 ||
+               indexPath.row == KxTextEdButtonSep4) {
         W = 10.;
     } else {
         W = 40.;
