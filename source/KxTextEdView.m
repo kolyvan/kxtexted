@@ -39,7 +39,6 @@
 static NSString *const KxTextEdViewListItemAttribute = @"KxTextEdViewListItemAttribute";
 static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribute";
 
-
 @interface KxTextEdView()<UITextViewDelegate>
 @property (readwrite, nonatomic, weak) id<UITextViewDelegate> realDelegate;
 @end
@@ -1115,6 +1114,32 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     return NSMakeRange(location, 0);
 }
 
+- (BOOL) insertPasteboardType:(NSString *)pasteboardType
+                    asDocType:(NSString *)docType
+{
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    
+    if ([pasteboard containsPasteboardTypes:@[pasteboardType]]) {
+        
+        NSData *data = [pasteboard dataForPasteboardType:pasteboardType];
+        if (data) {
+            
+            NSAttributedString *as;
+            as = [[NSAttributedString alloc] initWithData:data
+                                                  options:@{ NSDocumentTypeDocumentAttribute : docType }
+                                       documentAttributes:nil
+                                                    error:nil];
+            if (as.length) {
+                
+                [self insertAttributedString:as range:self.selectedRange];
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
+}
+
 #pragma mark - override
 
 - (void) setFont:(UIFont *)font
@@ -1132,8 +1157,6 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
 - (void) paste:(id)sender
 {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    
-    // TODO: public.rtf, Apple Web Archive pasteboard type, iOS rich content paste pasteboard type
     
     if ([pasteboard containsPasteboardTypes:@[@"public.url", @"public.image"]]) {
         
@@ -1166,7 +1189,40 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         }
     }
     
+    if ([self insertPasteboardType:@"com.apple.flat-rtfd" asDocType:NSRTFDTextDocumentType] ||
+        [self insertPasteboardType:@"public.rtf" asDocType:NSRTFTextDocumentType] ||
+        [self insertPasteboardType:@"Apple Web Archive pasteboard type" asDocType:NSHTMLTextDocumentType])
+    {
+        return;
+    }
+    
     [super paste:sender];
+}
+
+- (void) copy:(id)sender
+{
+    // rtfd data copied by textView's default implementation does not have a proper richtext attributes
+    // so will copy to pasteboard by yourself
+    const NSRange selRange = self.selectedRange;
+    if (selRange.length) {
+        
+        NSData *rtfd = [self.textStorage dataFromRange:selRange
+                                    documentAttributes:@{ NSDocumentTypeDocumentAttribute : NSRTFDTextDocumentType}
+                                                 error:nil];
+        
+        NSString *plain = [self texted_textInRange:selRange];
+            
+        if (rtfd.length && plain.length) {
+        
+            UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+            pasteboard.items = @[ @{ @"com.apple.flat-rtfd"    : rtfd,
+                                     @"public.utf8-plain-text" : plain, }];
+            return;
+        }
+    }
+    
+    // then let default impementation works
+    [super copy:sender];
 }
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
