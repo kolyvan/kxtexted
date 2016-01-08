@@ -1158,7 +1158,7 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
 {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    if ([pasteboard containsPasteboardTypes:@[@"public.url", @"public.image"]]) {
+    if ([pasteboard containsPasteboardTypes:@[@"public.url", @"public.image", @"com.apple.uikit.image"]]) {
         
         NSURL *URL; UIImage *image;
         
@@ -1168,6 +1168,10 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
         }
         
         value = [pasteboard valueForPasteboardType:@"public.image"];
+        if (!value) {
+            value = [pasteboard valueForPasteboardType:@"com.apple.uikit.image"];
+        }
+        
         if (value) {
 
             if ([value isKindOfClass:[UIImage class]]) {
@@ -1230,6 +1234,9 @@ static NSString *const KxTextEdViewSearchAttribute = @"KxTextEdViewSearchAttribu
     if (action == @selector(paste:)) {
         
         UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        if ([pasteboard containsPasteboardTypes:@[@"com.apple.uikit.image"]]) {
+            return YES;
+        }
         if (![pasteboard containsPasteboardTypes:@[@"public.text", @"public.url", @"public.image"]]) {
             return NO;
         }
